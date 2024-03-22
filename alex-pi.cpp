@@ -3,10 +3,10 @@
 #include <semaphore.h>
 #include <unistd.h>
 #include <stdint.h>
-#include "Alex/packet.h"
+#include "packet.h"
 #include "serial.h"
 #include "serialize.h"
-#include "Alex/constants.h"
+#include "constants.h"
 
 #define PORT_NAME			"/dev/ttyACM0"
 #define BAUD_RATE			B9600
