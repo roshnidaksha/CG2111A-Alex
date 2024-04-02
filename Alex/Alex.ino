@@ -108,125 +108,6 @@ void right(float ang, float speed) {
   cw(ang, speed);
 }
 
-/*
- * Setup and start codes for serial communications
- * 
- */
-// Set up the serial connection. For now we are using 
-// Arduino Wiring, you will replace this later
-// with bare-metal code.
-void setupSerial() {
-  // To replace later with bare-metal.
-  Serial.begin(9600);
-  // Change Serial to Serial2/Serial3/Serial4 in later labs when using the other UARTs
-}
-
-// Start the serial connection. For now we are using
-// Arduino wiring and this function is empty. We will
-// replace this later with bare-metal code.
-
-void startSerial() {
-  // Empty for now. To be replaced with bare-metal code
-  // later on.
-}
-
-// Read the serial port. Returns the read character in
-// ch if available. Also returns TRUE if ch is valid. 
-// This will be replaced later with bare-metal code.
-
-int readSerial(char *buffer) {
-  int count = 0;
-
-  // Change Serial to Serial2/Serial3/Serial4 in later labs when using other UARTs
-  while(Serial.available()) {
-    buffer[count++] = Serial.read();
-  }
-  return count;
-}
-
-// Write to the serial port. Replaced later with
-// bare-metal code
-
-void writeSerial(const char *buffer, int len) {
-  Serial.write(buffer, len);
-  // Change Serial to Serial2/Serial3/Serial4 in later labs when using other UARTs
-}
-
-/*
- * Alex's setup and run codes
- * 
- */
-
-// Clears all our counters
-void clearCounters() {
-  leftForwardTicks = 0;
-  rightForwardTicks = 0;
-  leftReverseTicks = 0;
-  rightReverseTicks = 0;
-
-  leftForwardTicksTurns = 0;
-  rightForwardTicksTurns = 0;
-  leftReverseTicksTurns = 0;
-  rightReverseTicksTurns = 0;
-
-  forwardDist = 0;
-  reverseDist = 0; 
-}
-
-// Clears one particular counter
-void clearOneCounter(int which) {
-  switch(which) {
-    case 0:
-      clearCounters();
-      break;
-
-    case 1:
-      leftForwardTicks = 0;
-      break;
-
-    case 2:
-      rightForwardTicks = 0;
-      break;
-
-    case 3:
-      leftReverseTicks = 0;
-      break;
-
-    case 4:
-      rightReverseTicks = 0;
-      break;
-
-    case 5:
-      leftForwardTicksTurns = 0;
-      break;
-
-    case 6:
-      rightForwardTicksTurns = 0;
-      break;
-
-    case 7:
-      leftReverseTicksTurns = 0;
-      break;
-
-    case 8:
-      rightReverseTicksTurns = 0;
-      break;
-
-    case 9:
-      forwardDist = 0;
-      break;
-
-    case 10:
-      reverseDist = 0;
-      break;
-  }
-}
-
-// Intialize Alex's internal states
-
-void initializeState() {
-  clearCounters();
-}
 
 void handleCommand(TPacket *command) {
   switch(command->command) {
@@ -271,49 +152,6 @@ void handleCommand(TPacket *command) {
   }
 }
 
-void waitForHello() {
-  int exit = 0;
-
-  while(!exit) {
-    TPacket hello;
-    TResult result;
-    
-    do {
-      result = readPacket(&hello);
-    } while (result == PACKET_INCOMPLETE);
-
-    if(result == PACKET_OK) {
-      if(hello.packetType == PACKET_TYPE_HELLO) {
-        sendOK();
-        exit = 1;
-      }
-      else {
-        sendBadResponse();
-      }
-    }
-    else if(result == PACKET_BAD) {
-      sendBadPacket();
-    }
-    else if(result == PACKET_CHECKSUM_BAD) {
-      sendBadChecksum();
-    }
-  } // !exit
-}
-
-void setup() {
-  // put your setup code here, to run once:
-  alexDiagonal = sqrt((ALEX_LENGTH * ALEX_LENGTH) + (ALEX_BREADTH *  ALEX_BREADTH)); 
-  alexCirc = PI  * alexDiagonal; 
-
-  cli();
-  setupEINT();
-  setupSerial();
-  startSerial();
-  enablePullups();
-  initializeState();
-  sei();
-}
-
 void handlePacket(TPacket *packet) {
   switch(packet->packetType) {
     case PACKET_TYPE_COMMAND:
@@ -334,14 +172,24 @@ void handlePacket(TPacket *packet) {
   }
 }
 
+
+void setup() {
+  // put your setup code here, to run once:
+  alexDiagonal = sqrt((ALEX_LENGTH * ALEX_LENGTH) + (ALEX_BREADTH *  ALEX_BREADTH)); 
+  alexCirc = PI  * alexDiagonal; 
+
+  cli();
+  setupEINT();
+  setupSerial();
+  startSerial();
+  enablePullups();
+  initializeState();
+  sei();
+}
+
 void loop() {
-  //forward(0, 100);
 
-  // Uncomment the code below for Week 9 Studio 2
-
-  // put your main code here, to run repeatedly:
   TPacket recvPacket; // This holds commands from the Pi
-
   TResult result = readPacket(&recvPacket);
   
   if(result == PACKET_OK) {
