@@ -15,15 +15,12 @@ volatile TDirection dir;
 // PI, for calculating circumference
 #define PI 3.141592654
 
-// Number of ticks per revolution from the 
-// wheel encoder.
-
+// Number of ticks per revolution from the wheel encoder.
 #define COUNTS_PER_REV 4
 
 // Wheel circumference in cm.
 // We will use this to calculate forward/backward distance traveled 
 // by taking revs * WHEEL_CIRC
-
 #define WHEEL_CIRC (6.2 * PI)
 
 // Alex's length and breadth in cm.
