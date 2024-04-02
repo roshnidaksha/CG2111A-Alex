@@ -17,16 +17,14 @@ AF_DCMotor motorFR(FRONT_RIGHT);
 AF_DCMotor motorBL(BACK_LEFT);
 AF_DCMotor motorBR(BACK_RIGHT);
 
-void move(float speed, int direction)
-{
+void move(float speed, int direction) {
   int speed_scaled = (speed/100.0) * 255;
   motorFL.setSpeed(speed_scaled);
   motorFR.setSpeed(speed_scaled);
   motorBL.setSpeed(speed_scaled);
   motorBR.setSpeed(speed_scaled);
 
-  switch(direction)
-    {
+  switch(direction) {
       case BACK:
         motorFL.run(BACKWARD);
         motorFR.run(FORWARD);
@@ -42,16 +40,14 @@ void move(float speed, int direction)
       case CW:
         motorFL.run(FORWARD);
         motorFR.run(FORWARD);
-        //motorBL.run(FORWARD);
-        motorBL.run(0);
+        motorBL.run(FORWARD);
         motorBR.run(FORWARD);  
       break;
       case CCW:
         motorFL.run(BACKWARD);
         motorFR.run(BACKWARD);
         motorBL.run(BACKWARD);
-        //motorBR.run(BACKWARD);
-        motorBR.run(0);
+        motorBR.run(BACKWARD);
       break;
       case STOP:
       default:
@@ -62,56 +58,45 @@ void move(float speed, int direction)
     }
 }
 
-void forward(float dist, float speed)
-{
-  if(dist > 0) 
-  {
+void forward(float dist, float speed) {
+  if(dist > 0) {
     deltaDist = dist; 
   }
-  else
-  { 
+  else { 
     deltaDist=9999999; 
   }
   
   newDist = forwardDist + deltaDist; 
-
   dir = (TDirection) FORWARD;
   move(speed, FORWARD);
 }
 
-void backward(float dist, float speed)
-{
-  if(dist > 0) 
-  {
+void backward(float dist, float speed) {
+  if(dist > 0) {
     deltaDist = dist; 
   }
-  else
-  { 
+  else { 
     deltaDist=9999999; 
   }
   
   newDist = reverseDist + deltaDist; 
-
   dir = (TDirection) BACKWARD;
   move(speed, BACKWARD);
 }
 
-void ccw(float dist, float speed)
-{
+void ccw(float dist, float speed) {
   // turn left
   dir = (TDirection) LEFT;
   move(speed, CCW);
 }
 
-void cw(float dist, float speed)
-{
+void cw(float dist, float speed) {
   // turn right
   dir = (TDirection) RIGHT;
   move(speed, CW);
 }
 
-void stop()
-{
+void stop() {
   dir = (TDirection) FORWARD;
   move(0, STOP);
 }
