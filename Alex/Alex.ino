@@ -73,8 +73,7 @@ unsigned long targetTicks;
 
 // Function to estimate number of wheel ticks
 // needed to turn an angle
-unsigned long computeDeltaTicks(float ang) 
-{
+unsigned long computeDeltaTicks(float ang) {
   // We will assume that angular distance moved = linear distance moved in one wheel
   // revolution. This is (probably) incorrect but simplifies calculation.
   // # of wheel revs to make one full 360 turn is alexCirc / WHEEL_CIRC
@@ -88,32 +87,24 @@ unsigned long computeDeltaTicks(float ang)
 
 
 void left(float ang, float speed) {
-  if(ang == 0) 
-  { 
+  if(ang == 0) { 
     deltaTicks = 99999999; 
   }
-  else
-  { 
+  else { 
     deltaTicks = computeDeltaTicks(ang); 
   }
-
   targetTicks = leftReverseTicksTurns + deltaTicks;
-  
   ccw(ang, speed);
 }
 
 void right(float ang, float speed) {
-  if(ang == 0) 
-  { 
+  if(ang == 0) { 
     deltaTicks = 99999999; 
   }
-  else
-  { 
+  else { 
     deltaTicks = computeDeltaTicks(ang); 
   }
-  
   targetTicks = rightReverseTicksTurns + deltaTicks;
-
   cw(ang, speed);
 }
 
@@ -125,8 +116,7 @@ void right(float ang, float speed) {
  * 
  */
  
-TResult readPacket(TPacket *packet)
-{
+TResult readPacket(TPacket *packet) {
   // Reads in data from the serial port and
   // deserializes it.Returns deserialized
   // data in "packet".
@@ -140,12 +130,10 @@ TResult readPacket(TPacket *packet)
     return PACKET_INCOMPLETE;
   } else {
     return deserialize(buffer, len, packet);
-  }
-    
+  }    
 }
 
-void sendStatus()
-{
+void sendStatus() {
   // Implement code to send back a packet containing key
   // information like leftTicks, rightTicks, leftRevs, rightRevs
   // forwardDist and reverseDist
@@ -156,23 +144,24 @@ void sendStatus()
   TPacket statusPacket;
   statusPacket.packetType = PACKET_TYPE_RESPONSE;
   statusPacket.command = RESP_STATUS;
+  
   statusPacket.params[0] = leftForwardTicks;
   statusPacket.params[1] = rightForwardTicks;
   statusPacket.params[2] = leftReverseTicks;
   statusPacket.params[3] = rightReverseTicks;
+  
   statusPacket.params[4] = leftForwardTicksTurns;
   statusPacket.params[5] = rightForwardTicksTurns;
   statusPacket.params[6] = leftReverseTicksTurns;
   statusPacket.params[7] = rightReverseTicksTurns;
+  
   statusPacket.params[8] = forwardDist;
   statusPacket.params[9] = reverseDist;
 
   sendResponse(&statusPacket);
-
 }
 
-void sendMessage(const char *message)
-{
+void sendMessage(const char *message) {
   // Sends text messages back to the Pi. Useful
   // for debugging.
   
@@ -182,8 +171,7 @@ void sendMessage(const char *message)
   sendResponse(&messagePacket);
 }
 
-void dbprintf(char *format, ...) 
-{ 
+void dbprintf(char *format, ...)  { 
   // dbprintf("PI is %3.2f", PI) 
   // This will make whatever you print appear on the Alex client program running on the Pi
   // If what is being printed exceeds 128 bytes in total, Arduino will crash
@@ -196,8 +184,7 @@ void dbprintf(char *format, ...)
   sendMessage(buffer);  
 } 
 
-void sendBadPacket()
-{
+void sendBadPacket() {
   // Tell the Pi that it sent us a packet with a bad
   // magic number.
   
@@ -205,11 +192,9 @@ void sendBadPacket()
   badPacket.packetType = PACKET_TYPE_ERROR;
   badPacket.command = RESP_BAD_PACKET;
   sendResponse(&badPacket);
-  
 }
 
-void sendBadChecksum()
-{
+void sendBadChecksum() {
   // Tell the Pi that it sent us a packet with a bad
   // checksum.
   
@@ -219,8 +204,7 @@ void sendBadChecksum()
   sendResponse(&badChecksum);  
 }
 
-void sendBadCommand()
-{
+void sendBadCommand() {
   // Tell the Pi that we don't understand its
   // command sent to us.
   
@@ -230,24 +214,21 @@ void sendBadCommand()
   sendResponse(&badCommand);
 }
 
-void sendBadResponse()
-{
+void sendBadResponse() {
   TPacket badResponse;
   badResponse.packetType = PACKET_TYPE_ERROR;
   badResponse.command = RESP_BAD_RESPONSE;
   sendResponse(&badResponse);
 }
 
-void sendOK()
-{
+void sendOK() {
   TPacket okPacket;
   okPacket.packetType = PACKET_TYPE_RESPONSE;
   okPacket.command = RESP_OK;
   sendResponse(&okPacket);  
 }
 
-void sendResponse(TPacket *packet)
-{
+void sendResponse(TPacket *packet) {
   // Takes a packet, serializes it then sends it out
   // over the serial port.
   char buffer[PACKET_SIZE];
@@ -264,8 +245,7 @@ void sendResponse(TPacket *packet)
  * 
  */
 // Enable pull up resistors on pins 18 and 19
-void enablePullups()
-{
+void enablePullups() {
   // Use bare-metal to enable the pull-up resistors on pins
   // 19 and 18. These are pins PD2 and PD3 respectively.
   // We set bits 2 and 3 in DDRD to 0 to make them inputs. 
@@ -274,52 +254,42 @@ void enablePullups()
 }
 
 // Functions to be called by INT2 and INT3 ISRs.
-void leftISR()
-{
-  if (dir == FORWARD) 
-  {
+void leftISR() {
+  if (dir == FORWARD) {
     leftForwardTicks++;
     forwardDist = (unsigned long) ((float) leftForwardTicks / COUNTS_PER_REV * WHEEL_CIRC); 
   } 
-  else if (dir == BACKWARD) 
-  {
+  else if (dir == BACKWARD) {
     leftReverseTicks++;
     reverseDist = (unsigned long) ((float) leftReverseTicks / COUNTS_PER_REV * WHEEL_CIRC); 
   } 
-  else if (dir == LEFT) 
-  {
+  else if (dir == LEFT) {
     leftReverseTicksTurns++;
   }
-  else if (dir == RIGHT) 
-  {
+  else if (dir == RIGHT) {
     leftForwardTicksTurns++;
   }
 }
 
 void rightISR()
 {
-  if (dir == FORWARD) 
-  {
+  if (dir == FORWARD) {
     rightForwardTicks++;
   } 
-  else if (dir == BACKWARD) 
-  {
+  else if (dir == BACKWARD) {
     rightReverseTicks++;
   }
-  else if (dir == LEFT) 
-  {
+  else if (dir == LEFT) {
     rightForwardTicksTurns++;
   }
-  else if (dir == RIGHT) 
-  {
+  else if (dir == RIGHT) {
     rightReverseTicksTurns++;
   }
 }
 
 // Set up the external interrupt pins INT2 and INT3
 // for falling edge triggered. Use bare-metal.
-void setupEINT()
-{
+void setupEINT() {
   // Use bare-metal to configure pins 18 and 19 to be
   // falling edge triggered. Remember to enable
   // the INT2 and INT3 interrupts.
@@ -332,13 +302,11 @@ void setupEINT()
 // Implement the external interrupt ISRs below.
 // INT3 ISR should call leftISR while INT2 ISR
 // should call rightISR.
-ISR(INT2_vect) 
-{
+ISR(INT2_vect) {
   rightISR();
 }
 
-ISR(INT3_vect) 
-{
+ISR(INT3_vect) {
   leftISR();
 }
 // Implement INT2 and INT3 ISRs above.
@@ -350,8 +318,7 @@ ISR(INT3_vect)
 // Set up the serial connection. For now we are using 
 // Arduino Wiring, you will replace this later
 // with bare-metal code.
-void setupSerial()
-{
+void setupSerial() {
   // To replace later with bare-metal.
   Serial.begin(9600);
   // Change Serial to Serial2/Serial3/Serial4 in later labs when using the other UARTs
@@ -361,8 +328,7 @@ void setupSerial()
 // Arduino wiring and this function is empty. We will
 // replace this later with bare-metal code.
 
-void startSerial()
-{
+void startSerial() {
   // Empty for now. To be replaced with bare-metal code
   // later on.
 }
@@ -371,13 +337,10 @@ void startSerial()
 // ch if available. Also returns TRUE if ch is valid. 
 // This will be replaced later with bare-metal code.
 
-int readSerial(char *buffer)
-{
-
+int readSerial(char *buffer) {
   int count = 0;
 
   // Change Serial to Serial2/Serial3/Serial4 in later labs when using other UARTs
-
   while(Serial.available()) {
     buffer[count++] = Serial.read();
   }
@@ -387,8 +350,7 @@ int readSerial(char *buffer)
 // Write to the serial port. Replaced later with
 // bare-metal code
 
-void writeSerial(const char *buffer, int len)
-{
+void writeSerial(const char *buffer, int len) {
   Serial.write(buffer, len);
   // Change Serial to Serial2/Serial3/Serial4 in later labs when using other UARTs
 }
@@ -399,8 +361,7 @@ void writeSerial(const char *buffer, int len)
  */
 
 // Clears all our counters
-void clearCounters()
-{
+void clearCounters() {
   leftForwardTicks = 0;
   rightForwardTicks = 0;
   leftReverseTicks = 0;
@@ -416,10 +377,8 @@ void clearCounters()
 }
 
 // Clears one particular counter
-void clearOneCounter(int which)
-{
-  switch(which)
-  {
+void clearOneCounter(int which) {
+  switch(which) {
     case 0:
       clearCounters();
       break;
@@ -468,15 +427,12 @@ void clearOneCounter(int which)
 
 // Intialize Alex's internal states
 
-void initializeState()
-{
+void initializeState() {
   clearCounters();
 }
 
-void handleCommand(TPacket *command)
-{
-  switch(command->command)
-  {
+void handleCommand(TPacket *command) {
+  switch(command->command) {
     // For movement commands, param[0] = distance, param[1] = speed.
     case COMMAND_GET_STATS:
       sendOK();
@@ -518,45 +474,36 @@ void handleCommand(TPacket *command)
   }
 }
 
-void waitForHello()
-{
+void waitForHello() {
   int exit = 0;
 
-  while(!exit)
-  {
+  while(!exit) {
     TPacket hello;
     TResult result;
     
-    do
-    {
+    do {
       result = readPacket(&hello);
     } while (result == PACKET_INCOMPLETE);
 
-    if(result == PACKET_OK)
-    {
-      if(hello.packetType == PACKET_TYPE_HELLO)
-      {
+    if(result == PACKET_OK) {
+      if(hello.packetType == PACKET_TYPE_HELLO) {
         sendOK();
         exit = 1;
       }
-      else 
-      {
+      else {
         sendBadResponse();
       }
     }
-    else if(result == PACKET_BAD)
-    {
+    else if(result == PACKET_BAD) {
       sendBadPacket();
     }
-    else if(result == PACKET_CHECKSUM_BAD)
-    {
+    else if(result == PACKET_CHECKSUM_BAD) {
       sendBadChecksum();
     }
   } // !exit
 }
 
-void setup() 
-{
+void setup() {
   // put your setup code here, to run once:
   alexDiagonal = sqrt((ALEX_LENGTH * ALEX_LENGTH) + (ALEX_BREADTH *  ALEX_BREADTH)); 
   alexCirc = PI  * alexDiagonal; 
@@ -570,10 +517,8 @@ void setup()
   sei();
 }
 
-void handlePacket(TPacket *packet)
-{
-  switch(packet->packetType)
-  {
+void handlePacket(TPacket *packet) {
+  switch(packet->packetType) {
     case PACKET_TYPE_COMMAND:
       handleCommand(packet);
       break;
@@ -592,8 +537,7 @@ void handlePacket(TPacket *packet)
   }
 }
 
-void loop() 
-{
+void loop() {
   //forward(0, 100);
 
   // Uncomment the code below for Week 9 Studio 2
@@ -603,69 +547,54 @@ void loop()
 
   TResult result = readPacket(&recvPacket);
   
-  if(result == PACKET_OK)
-  {
+  if(result == PACKET_OK) {
     handlePacket(&recvPacket);
   }
-  else if(result == PACKET_BAD)
-  {
+  else if(result == PACKET_BAD) {
     sendBadPacket();
   }
-  else if(result == PACKET_CHECKSUM_BAD)
-  {
+  else if(result == PACKET_CHECKSUM_BAD) {
     sendBadChecksum();
   } 
 
-  if(deltaDist > 0) 
-  { 
-    if(dir == FORWARD) 
-    { 
-      if(forwardDist > newDist) 
-      { 
+  if(deltaDist > 0) { 
+    if(dir == FORWARD) { 
+      if(forwardDist > newDist) { 
         deltaDist = 0; 
         newDist = 0; 
         stop(); 
       } 
     } 
-    else if(dir == BACKWARD) 
-    { 
-      if(reverseDist > newDist) 
-      { 
+    else if(dir == BACKWARD) { 
+      if(reverseDist > newDist) { 
         deltaDist = 0; 
         newDist = 0; 
         stop(); 
       } 
     } 
-    else if(dir == STOP) 
-    { 
+    else if(dir == STOP) { 
       deltaDist = 0; 
       newDist = 0; 
       stop(); 
     } 
   } 
 
-  if (deltaTicks > 0)
-  {
-    if (dir == LEFT)
-    {
-      if (leftReverseTicksTurns >= targetTicks)
-      {
+  if (deltaTicks > 0) {
+    if (dir == LEFT) {
+      if (leftReverseTicksTurns >= targetTicks) {
         deltaTicks = 0;
         targetTicks = 0;
         stop();
       }
     }
-    else if (dir == RIGHT)
-    {
-      if (rightReverseTicksTurns >= targetTicks)
-      {
+    else if (dir == RIGHT) {
+      if (rightReverseTicksTurns >= targetTicks) {
         deltaTicks = 0;
         targetTicks = 0;
         stop();
       }
     }
-    else if (dir == STOP)
-    {
+    else if (dir == STOP) {
       deltaTicks = 0;
       targetTicks = 0;
       stop();
