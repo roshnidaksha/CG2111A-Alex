@@ -47,6 +47,9 @@ void handleStatus(TPacket *packet)
 	printf("\n---------------------------------------\n\n");
 }
 
+void handleColor(TPacket *packet) {
+}
+
 void handleResponse(TPacket *packet)
 {
 	// The response code is stored in command
@@ -54,11 +57,15 @@ void handleResponse(TPacket *packet)
 	{
 		case RESP_OK:
 			printf("Command OK\n");
-		break;
+			break;
 
 		case RESP_STATUS:
 			handleStatus(packet);
-		break;
+			break;
+
+		case RESP_COLOR:
+			handleColor(packet);
+			break;
 
 		default:
 			printf("Arduino is confused\n");
@@ -72,19 +79,19 @@ void handleErrorResponse(TPacket *packet)
 	{
 		case RESP_BAD_PACKET:
 			printf("Arduino received bad magic number\n");
-		break;
+			break;
 
 		case RESP_BAD_CHECKSUM:
 			printf("Arduino received bad checksum\n");
-		break;
+			break;
 
 		case RESP_BAD_COMMAND:
 			printf("Arduino received bad command\n");
-		break;
+			break;
 
 		case RESP_BAD_RESPONSE:
 			printf("Arduino received unexpected response\n");
-		break;
+			break;
 
 		default:
 			printf("Arduino reports a weird error\n");
@@ -101,19 +108,19 @@ void handlePacket(TPacket *packet)
 	switch(packet->packetType)
 	{
 		case PACKET_TYPE_COMMAND:
-				// Only we send command packets, so ignore
+			// Only we send command packets, so ignore
 			break;
 
 		case PACKET_TYPE_RESPONSE:
-				handleResponse(packet);
+			handleResponse(packet);
 			break;
 
 		case PACKET_TYPE_ERROR:
-				handleErrorResponse(packet);
+			handleErrorResponse(packet);
 			break;
 
 		case PACKET_TYPE_MESSAGE:
-				handleMessage(packet);
+			handleMessage(packet);
 			break;
 	}
 }
@@ -229,6 +236,12 @@ void sendCommand(char command)
 		case 'q':
 		case 'Q':
 			exitFlag=1;
+			break;
+
+		case 'v':
+		case 'V':
+			commandPacket.command = COMMAND_COLOR;
+			sendPacket(&commandPacket);
 			break;
 
 		default:
