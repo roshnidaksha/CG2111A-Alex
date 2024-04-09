@@ -6,7 +6,8 @@
 
 #include <math.h>
 
-volatile TDirection dir; 
+volatile TDirection dir;
+int MANUAL_MODE = false;
 
 /*
  * Alex's configuration constants
@@ -121,22 +122,26 @@ void handleCommand(TPacket *command) {
 
     case COMMAND_FORWARD:
       sendOK();
-      forward((float) command->params[0], (float) command->params[1]);
+      if (MANUAL_MODE) forward((float) command->params[0], (float) command->params[1]);
+      else forward(5.0, 40);
       break;
 
     case COMMAND_REVERSE:
       sendOK();
-      backward((float) command->params[0], (float) command->params[1]);
+      if (MANUAL_MODE) backward((float) command->params[0], (float) command->params[1]);
+      else backward(5.0 40);
       break;
 
     case COMMAND_TURN_LEFT:
       sendOK();
-      left((float) command->params[0], (float) command->params[1]);
+      if (MANUAL_MODE) left((float) command->params[0], (float) command->params[1]);
+      else left(20, 50);
       break;
 
     case COMMAND_TURN_RIGHT:
       sendOK();
-      right((float) command->params[0], (float) command->params[1]);
+      if (MANUAL_MODE) right((float) command->params[0], (float) command->params[1]);
+      else right(20, 50);
       break;
 
     case COMMAND_STOP:
@@ -146,6 +151,11 @@ void handleCommand(TPacket *command) {
 
     case COMMAND_COLOR:
       getcolor();
+      sendOK();
+      break;
+
+    case COMMAND_MANUAL:
+      MANUAL_MODE = !MANUAL_MODE;
       sendOK();
       break;
         
