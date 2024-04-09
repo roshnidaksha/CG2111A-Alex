@@ -14,6 +14,26 @@
 int exitFlag=0;
 sem_t _xmitSema;
 
+char getch() {
+	char buf = 0;
+	struct termios old = {0};
+	if (tcgetattr(0, &old) < 0)
+			perror("tcsetattr()");
+	old.c_lflag &= ~ICANON;
+	old.c_lflag &= ~ECHO;
+	old.c_cc[VMIN] = 1;
+	old.c_cc[VTIME] = 0;
+	if (tcsetattr(0, TCSANOW, &old) < 0)
+			perror("tcsetattr ICANON");
+	if (read(0, &buf, 1) < 0)
+			perror ("read()");
+	old.c_lflag |= ICANON;
+	old.c_lflag |= ECHO;
+	if (tcsetattr(0, TCSADRAIN, &old) < 0)
+			perror ("tcsetattr ~ICANON");
+	return (buf);
+}
+
 void handleError(TResult error)
 {
 	switch(error)
@@ -141,21 +161,17 @@ void *receiveThread(void *p)
 	TResult result;
 	int counter=0;
 
-	while(1)
-	{
+	while(1) {
 		len = serialRead(buffer);
 		counter += len;
-		if(len > 0)
-		{
+		if(len > 0) {
 			result = deserialize(buffer, len, &packet);
 
-			if(result == PACKET_OK)
-			{
+			if(result == PACKET_OK) {
 				counter=0;
 				handlePacket(&packet);
 			}
-			else if(result != PACKET_INCOMPLETE)
-			{
+			else if(result != PACKET_INCOMPLETE) {
 				printf("PACKET ERROR\n");
 				handleError(result);
 			}
@@ -178,7 +194,7 @@ void getParams(TPacket *commandPacket)
 	flushInput();
 }
 
-void sendCommand(char command)
+void sendCommand(char command, bool manual)
 {
 	TPacket commandPacket;
 
@@ -188,40 +204,46 @@ void sendCommand(char command)
 	{
 		case 'f':
 		case 'F':
-			getParams(&commandPacket);
+			printf("FORWARD\n");
+			if (manual) getParams(&commandPacket);
 			commandPacket.command = COMMAND_FORWARD;
 			sendPacket(&commandPacket);
 			break;
 
 		case 'b':
 		case 'B':
-			getParams(&commandPacket);
+			printf("BACKWARD\n");
+			if (manual) getParams(&commandPacket);
 			commandPacket.command = COMMAND_REVERSE;
 			sendPacket(&commandPacket);
 			break;
 
 		case 'l':
 		case 'L':
-			getParams(&commandPacket);
+			printf("LEFT\n);
+			if (manual) getParams(&commandPacket);
 			commandPacket.command = COMMAND_TURN_LEFT;
 			sendPacket(&commandPacket);
 			break;
 
 		case 'r':
 		case 'R':
-			getParams(&commandPacket);
+			printf("RIGHT\n");
+			if (manual) getParams(&commandPacket);
 			commandPacket.command = COMMAND_TURN_RIGHT;
 			sendPacket(&commandPacket);
 			break;
 
 		case 's':
 		case 'S':
+			printf("STOP\n")
 			commandPacket.command = COMMAND_STOP;
 			sendPacket(&commandPacket);
 			break;
 
 		case 'c':
 		case 'C':
+			printf("CLEAR\n");
 			commandPacket.command = COMMAND_CLEAR_STATS;
 			commandPacket.params[0] = 0;
 			sendPacket(&commandPacket);
@@ -229,6 +251,7 @@ void sendCommand(char command)
 
 		case 'g':
 		case 'G':
+			printf("STATS\n");
 			commandPacket.command = COMMAND_GET_STATS;
 			sendPacket(&commandPacket);
 			break;
@@ -241,6 +264,14 @@ void sendCommand(char command)
 		case 'v':
 		case 'V':
 			commandPacket.command = COMMAND_COLOR;
+			sendPacket(&commandPacket);
+			break;
+
+		case 'm':
+		case 'M':
+			if (manual) printf("SET TO MANUAL MODE\n");
+			else printf("SET TO AUTO MODE\n");
+			commandPacket.command = COMMAND_MANUAL;
 			sendPacket(&commandPacket);
 			break;
 
@@ -271,16 +302,30 @@ int main()
 	helloPacket.packetType = PACKET_TYPE_HELLO;
 	sendPacket(&helloPacket);
 
+	int manual = false;
+
+	printf("\nWASD for movement, f=stop, e=get stats, r=clear stats, q=exit\n");
+	
 	while(!exitFlag)
 	{
 		char ch;
-		printf("Command (f=forward, b=reverse, l=turn left, r=turn right, s=stop, c=clear stats, g=get stats q=exit)\n");
-		scanf("%c", &ch);
 
-		// Purge extraneous characters from input stream
-		flushInput();
+		if (manual) {
+			printf("\nWASD for movement, f=stop, e=get stats, r=clear stats, q=exit\n");
+			scanf("%c", &ch);
 
-		sendCommand(ch);
+			// Purge extraneous characters from input stream
+			flushInput();
+		}
+		else ch = getch();
+
+		if (ch == MANUAL) {
+			manual = !manual;
+		}
+		
+		// printf("Command (f=forward, b=reverse, l=turn left, r=turn right, s=stop, c=clear stats, g=get stats q=exit)\n");
+
+		sendCommand(ch, manual);
 	}
 
 	printf("Closing connection to Arduino.\n");
