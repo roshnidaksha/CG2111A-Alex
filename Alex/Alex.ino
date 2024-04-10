@@ -129,7 +129,7 @@ void handleCommand(TPacket *command) {
     case COMMAND_REVERSE:
       sendOK();
       if (MANUAL_MODE) backward((float) command->params[0], (float) command->params[1]);
-      else backward(5.0 40);
+      else backward(5.0, 40);
       break;
 
     case COMMAND_TURN_LEFT:
