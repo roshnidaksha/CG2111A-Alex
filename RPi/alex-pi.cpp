@@ -236,7 +236,7 @@ void sendCommand(char command, bool manual)
 
 		case 's':
 		case 'S':
-			printf("STOP\n")
+			printf("STOP\n");
 			commandPacket.command = COMMAND_STOP;
 			sendPacket(&commandPacket);
 			break;
@@ -304,14 +304,14 @@ int main()
 
 	int manual = false;
 
-	printf("\nWASD for movement, f=stop, e=get stats, r=clear stats, q=exit\n");
+	printf("\nCommand (f=forward, b=reverse, l=turn left, r=turn right, s=stop, c=clear stats, g=get stats q=exit)\n");
 	
 	while(!exitFlag)
 	{
 		char ch;
 
 		if (manual) {
-			printf("\nWASD for movement, f=stop, e=get stats, r=clear stats, q=exit\n");
+			printf("\nCommand (f=forward, b=reverse, l=turn left, r=turn right, s=stop, c=clear stats, g=get stats q=exit)\n");
 			scanf("%c", &ch);
 
 			// Purge extraneous characters from input stream
@@ -323,8 +323,6 @@ int main()
 			manual = !manual;
 		}
 		
-		// printf("Command (f=forward, b=reverse, l=turn left, r=turn right, s=stop, c=clear stats, g=get stats q=exit)\n");
-
 		sendCommand(ch, manual);
 	}
 
