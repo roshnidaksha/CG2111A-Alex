@@ -220,7 +220,7 @@ void sendCommand(char command, bool manual)
 
 		case 'l':
 		case 'L':
-			printf("LEFT\n);
+			printf("LEFT\n");
 			if (manual) getParams(&commandPacket);
 			commandPacket.command = COMMAND_TURN_LEFT;
 			sendPacket(&commandPacket);
