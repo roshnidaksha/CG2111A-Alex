@@ -70,6 +70,11 @@ void handleStatus(TPacket *packet)
 void handleColor(TPacket *packet) {
 }
 
+void handleDistance(TPacket *packet) {
+  	uint32_t distance = packet->params[0];
+	printf("Ultrasonic Distance: %d cm\n", distance);
+}
+
 void handleResponse(TPacket *packet)
 {
 	// The response code is stored in command
@@ -85,6 +90,10 @@ void handleResponse(TPacket *packet)
 
 		case RESP_COLOR:
 			handleColor(packet);
+			break;
+
+		case RESP_DIST:
+			handleDistance(packet);
 			break;
 
 		default:
@@ -263,7 +272,15 @@ void sendCommand(char command, bool manual)
 
 		case 'v':
 		case 'V':
+			printf("GET COLOR\n");
 			commandPacket.command = COMMAND_COLOR;
+			sendPacket(&commandPacket);
+			break;
+
+		case 'd':
+		case 'D':
+			printf("GET DIST\n");
+			commandPacket.command = COMMAND_DIST;
 			sendPacket(&commandPacket);
 			break;
 
