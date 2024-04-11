@@ -158,6 +158,11 @@ void handleCommand(TPacket *command) {
       MANUAL_MODE = !MANUAL_MODE;
       sendOK();
       break;
+
+    case COMMAND_DIST:
+      sendDistance();
+      sendOK();
+      break;
         
     default:
       sendBadCommand();
@@ -194,6 +199,7 @@ void setup() {
   setupEINT();
   setupSerial();
   startSerial();
+  setupUltrasonic();
   enablePullups();
   initializeState();
   sei();
