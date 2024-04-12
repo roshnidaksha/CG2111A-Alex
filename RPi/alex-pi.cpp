@@ -68,6 +68,31 @@ void handleStatus(TPacket *packet)
 }
 
 void handleColor(TPacket *packet) {
+	uint32_t red = packet->params[0];
+	uint32_t green = packet->params[1];
+	uint32_t blue = packet->params[2];
+
+	printf("\n --------- ALEX COLOR SENSOR --------- \n\n");
+	printf("Red (R) frequency:\t%d\n", red);
+	printf("Green (G) frequency:\t%d\n", green);
+	printf("Blue (B) frequency:\t%d\n", blue);
+
+	if (r < b && r < g) {
+	    	printf("Red\n");
+	}
+	else if (r < 70 && g < 70 && b < 70) {
+	    	printf("White\n");
+	}
+	else if (g < r && g < b) {
+		if (g < 130) {
+			printf("Green\n");
+		}
+	    	else {
+	     		printf("Dark Green: Possible Wall\n");
+	    	}
+	}
+	
+	printf("\n--------------------------------------\n\n");
 }
 
 void handleDistance(TPacket *packet) {
@@ -211,47 +236,47 @@ void sendCommand(char command, bool manual)
 
 	switch(command)
 	{
-		case 'f':
-		case 'F':
+		case 'w':
+		case 'W':
 			printf("FORWARD\n");
 			if (manual) getParams(&commandPacket);
 			commandPacket.command = COMMAND_FORWARD;
 			sendPacket(&commandPacket);
 			break;
 
-		case 'b':
-		case 'B':
+		case 's':
+		case 'S':
 			printf("BACKWARD\n");
 			if (manual) getParams(&commandPacket);
 			commandPacket.command = COMMAND_REVERSE;
 			sendPacket(&commandPacket);
 			break;
 
-		case 'l':
-		case 'L':
+		case 'a':
+		case 'A':
 			printf("LEFT\n");
 			if (manual) getParams(&commandPacket);
 			commandPacket.command = COMMAND_TURN_LEFT;
 			sendPacket(&commandPacket);
 			break;
 
-		case 'r':
-		case 'R':
+		case 'd':
+		case 'D':
 			printf("RIGHT\n");
 			if (manual) getParams(&commandPacket);
 			commandPacket.command = COMMAND_TURN_RIGHT;
 			sendPacket(&commandPacket);
 			break;
 
-		case 's':
-		case 'S':
+		case 'r':
+		case 'R':
 			printf("STOP\n");
 			commandPacket.command = COMMAND_STOP;
 			sendPacket(&commandPacket);
 			break;
 
-		case 'c':
-		case 'C':
+		case 'v':
+		case 'V':
 			printf("CLEAR\n");
 			commandPacket.command = COMMAND_CLEAR_STATS;
 			commandPacket.params[0] = 0;
@@ -270,15 +295,15 @@ void sendCommand(char command, bool manual)
 			exitFlag=1;
 			break;
 
-		case 'v':
-		case 'V':
+		case 'c':
+		case 'C':
 			printf("GET COLOR\n");
 			commandPacket.command = COMMAND_COLOR;
 			sendPacket(&commandPacket);
 			break;
 
-		case 'd':
-		case 'D':
+		case 'z':
+		case 'Z':
 			printf("GET DIST\n");
 			commandPacket.command = COMMAND_DIST;
 			sendPacket(&commandPacket);
@@ -321,14 +346,14 @@ int main()
 
 	int manual = false;
 
-	printf("\nCommand (f=forward, b=reverse, l=turn left, r=turn right, s=stop, c=clear stats, g=get stats q=exit)\n");
+	printf("\nWASD Commands (v=clear stats, g=get stats, q=exit, c=get color, z=get distance, m=manual)\n");
 	
 	while(!exitFlag)
 	{
 		char ch;
 
 		if (manual) {
-			printf("\nCommand (f=forward, b=reverse, l=turn left, r=turn right, s=stop, c=clear stats, g=get stats q=exit)\n");
+			printf("\nWASD Commands (v=clear stats, g=get stats, q=exit, c=get color, z=get distance, m=manual)\n");
 			scanf("%c", &ch);
 
 			// Purge extraneous characters from input stream
