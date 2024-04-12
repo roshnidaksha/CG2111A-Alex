@@ -9,7 +9,7 @@ void setupUltrasonic() {
   pinMode(ECHO, INPUT);
 }
 
-void getDistance() {
+uint32_t getDistance() {
   // Stop Trigger Pin
   digitalWrite(TRIGGER, LOW);
   delayMicroseconds(2);
@@ -22,6 +22,8 @@ void getDistance() {
   // Calculate distance in cm from duration measured in microseconds 
   duration = pulseIn(ECHO, HIGH); 
   distance = (duration * 0.0343) / 2;
+
+  return distance;
 }
 
 void sendDistance() {
