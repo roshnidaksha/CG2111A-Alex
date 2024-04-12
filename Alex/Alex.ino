@@ -199,6 +199,7 @@ void setup() {
   setupEINT();
   setupSerial();
   startSerial();
+  setupColor();
   setupUltrasonic();
   enablePullups();
   initializeState();
