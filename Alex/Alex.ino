@@ -151,6 +151,7 @@ void handleCommand(TPacket *command) {
 
     case COMMAND_COLOR:
       getcolor();
+      sendColor();
       sendOK();
       break;
 
