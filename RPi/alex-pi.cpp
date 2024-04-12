@@ -14,6 +14,8 @@
 int exitFlag=0;
 sem_t _xmitSema;
 
+static bool status = false;
+
 char getch() {
 	char buf = 0;
 	struct termios old = {0};
@@ -107,6 +109,7 @@ void handleResponse(TPacket *packet)
 	{
 		case RESP_OK:
 			printf("Command OK\n");
+			status = false;
 			break;
 
 		case RESP_STATUS:
@@ -318,6 +321,7 @@ void sendCommand(char command, bool manual)
 			break;
 
 		default:
+			status = false;
 			printf("Bad command\n");
 
 	}
@@ -364,8 +368,11 @@ int main()
 		if (ch == MANUAL) {
 			manual = !manual;
 		}
-		
-		sendCommand(ch, manual);
+
+		if (!status) {
+			status = true;
+			sendCommand(ch, manual);
+		}
 	}
 
 	printf("Closing connection to Arduino.\n");
