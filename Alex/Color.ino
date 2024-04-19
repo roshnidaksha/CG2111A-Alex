@@ -4,6 +4,13 @@
 #define S3 34
 #define sensorOut 30
 
+#define lowestR 75
+#define highestR 430
+#define lowestG 72
+#define highestG 440
+#define lowestB 58
+#define highestB 350
+
 int frequency = 0;
 int r = 0;
 int g = 0;
@@ -37,6 +44,12 @@ int getAvgReading(int times) {
   return total/times;
 }
 
+void mapValues(){
+  r = map(r, lowestR, highestR, 255, 0);
+  g = map(g, lowestG, highestG, 255, 0);
+  b = map(b, lowestB, highestB, 255, 0);
+}
+
 void getColor(){
   // Setting red filtered photodiodes to be read
   digitalWrite(S2,LOW);
@@ -67,10 +80,13 @@ void sendColor() {
   TPacket colorPacket;
   colorPacket.packetType = PACKET_TYPE_RESPONSE;
   colorPacket.command = RESP_COLOR;
+
+  uint32_t ultrasonicDist = getDistance();
   
-  colorPacket.params[0] = redFreq;
-  colorPacket.params[1] = greenFreq;
-  colorPacket.params[2] = blueFreq;
+  colorPacket.params[0] = r;
+  colorPacket.params[1] = g;
+  colorPacket.params[2] = b;
+  colorPacket.params[3] = ultrasonicDist;
   
   sendResponse(&colorPacket);  
 }
