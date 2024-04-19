@@ -73,26 +73,25 @@ void handleColor(TPacket *packet) {
 	uint32_t red = packet->params[0];
 	uint32_t green = packet->params[1];
 	uint32_t blue = packet->params[2];
+	int32_t dist = packet->params[3];
 
 	printf("\n --------- ALEX COLOR SENSOR --------- \n\n");
 	printf("Red (R) frequency:\t%d\n", red);
 	printf("Green (G) frequency:\t%d\n", green);
 	printf("Blue (B) frequency:\t%d\n", blue);
 
-	if (r < b && r < g) {
-	    	printf("Red\n");
+	printf("\nUltrasonic Distance = %d \n", dist);
+
+	if (r > b && r > g) {
+    		if ( g + b > r) printf("White\n");
+		else printf("Red\n");
+  	}
+	else if (g > r && g > b){
+		if (abs(r - g) < 10 && abs(g - b) < 10 && abs(r - b) < 10) printf("White\n");
+		else printf("Green\n");
 	}
-	else if (r < 70 && g < 70 && b < 70) {
-	    	printf("White\n");
-	}
-	else if (g < r && g < b) {
-		if (g < 130) {
-			printf("Green\n");
-		}
-	    	else {
-	     		printf("Dark Green: Possible Wall\n");
-	    	}
-	}
+	else if (abs(r - g) < 10 && abs(g - b) < 10 && abs(r - b) < 10) printf("White\n");
+ 	else printf("\n");
 	
 	printf("\n--------------------------------------\n\n");
 }
@@ -247,11 +246,27 @@ void sendCommand(char command, bool manual)
 			sendPacket(&commandPacket);
 			break;
 
+		case 'i':
+		case 'I':
+			printf("FORWARD HIGH\n");
+			if (manual) getParams(&commandPacket);
+			commandPacket.command = COMMAND_FORWARD_H;
+			sendPacket(&commandPacket);
+			break;
+
 		case 's':
 		case 'S':
 			printf("BACKWARD\n");
 			if (manual) getParams(&commandPacket);
 			commandPacket.command = COMMAND_REVERSE;
+			sendPacket(&commandPacket);
+			break;
+
+		case 'k':
+		case 'K':
+			printf("BACKWARD HIGH\n");
+			if (manual) getParams(&commandPacket);
+			commandPacket.command = COMMAND_REVERSE_H;
 			sendPacket(&commandPacket);
 			break;
 
