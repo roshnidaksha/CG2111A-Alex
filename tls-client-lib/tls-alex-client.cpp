@@ -186,25 +186,46 @@ void *writerThread(void *conn)
 		{
 			case 'w':
 			case 'W':
-			case 'i':
-			case 'I':
 			case 's':
 			case 'S':
+				if (manual) getParams(params);
+				else {
+					params[0] = 5;
+					params[1] = 40;
+				}
+				buffer[1] = ch;
+				memcpy(&buffer[2], params, sizeof(params));
+				sendData(conn, buffer, sizeof(buffer));
+				break;
+			
+			case 'i':
+			case 'I':
 			case 'k':
 			case 'K':
+				if (manual) getParams(params);
+				else {
+					params[0] = 10;
+					params[1] = 50;
+				}
+				buffer[1] = ch;
+				memcpy(&buffer[2], params, sizeof(params));
+				sendData(conn, buffer, sizeof(buffer));
+				break;
+		
 			case 'a':
 			case 'A':
 			case 'd':
 			case 'D':
 				if (manual) getParams(params);
 				else {
-					params[0] = 0;
-					params[1] = 0;
+					params[0] = 20;
+					params[1] = 50;
 				}
 				buffer[1] = ch;
 				memcpy(&buffer[2], params, sizeof(params));
 				sendData(conn, buffer, sizeof(buffer));
 				break;
+			
 			case 'r':
 			case 'R':
 			case 'v':
