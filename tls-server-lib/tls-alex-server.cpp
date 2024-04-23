@@ -231,38 +231,42 @@ void handleCommand(void *conn, const char *buffer)
 	
 	switch(cmd)
 	{
-		case 'f':
-		case 'F':
+		case 'w':
+		case 'W':
+		case 'i':
+		case 'I':
 			commandPacket.command = COMMAND_FORWARD;
-			uartSendPacket(&commandPacket);
-			break;
-
-		case 'b':
-		case 'B':
-			commandPacket.command = COMMAND_REVERSE;
-			uartSendPacket(&commandPacket);
-			break;
-
-		case 'l':
-		case 'L':
-			commandPacket.command = COMMAND_TURN_LEFT;
-			uartSendPacket(&commandPacket);
-			break;
-
-		case 'r':
-		case 'R':
-			commandPacket.command = COMMAND_TURN_RIGHT;
 			uartSendPacket(&commandPacket);
 			break;
 
 		case 's':
 		case 'S':
+		case 'k':
+		case 'K':
+			commandPacket.command = COMMAND_REVERSE;
+			uartSendPacket(&commandPacket);
+			break;
+
+		case 'a':
+		case 'A':
+			commandPacket.command = COMMAND_TURN_LEFT;
+			uartSendPacket(&commandPacket);
+			break;
+
+		case 'd':
+		case 'D':
+			commandPacket.command = COMMAND_TURN_RIGHT;
+			uartSendPacket(&commandPacket);
+			break;
+
+		case 'r':
+		case 'R':
 			commandPacket.command = COMMAND_STOP;
 			uartSendPacket(&commandPacket);
 			break;
 
-		case 'c':
-		case 'C':
+		case 'v':
+		case 'V':
 			commandPacket.command = COMMAND_CLEAR_STATS;
 			commandPacket.params[0] = 0;
 			uartSendPacket(&commandPacket);
@@ -271,6 +275,24 @@ void handleCommand(void *conn, const char *buffer)
 		case 'g':
 		case 'G':
 			commandPacket.command = COMMAND_GET_STATS;
+			uartSendPacket(&commandPacket);
+			break;
+
+		case 'c':
+		case 'C':
+			commandPacket.command = COMMAND_COLOR;
+			uartSendPacket(&commandPacket);
+			break;
+
+		case 'z':
+		case 'Z':
+			commandPacket.command = COMMAND_DIST;
+			uartSendPacket(&commandPacket);
+			break;
+
+		case 'm':
+		case 'M':
+			commandPacket.command = COMMAND_MANUAL;
 			uartSendPacket(&commandPacket);
 			break;
 
