@@ -160,15 +160,23 @@ void getParams(int32_t *params)
 void *writerThread(void *conn)
 {
 	int quit=0;
+	int manual = false;
 
 	while(!quit)
 	{
 		char ch;
-		printf("Command (f=forward, b=reverse, l=turn left, r=turn right, s=stop, c=clear stats, g=get stats q=exit)\n");
-		scanf("%c", &ch);
+		printf("\nWASD Commands (v=clear stats, g=get stats, q=exit, c=get color, z=get distance, m=manual)\n");
+		if (manual) {
+			scanf("%c", &ch);
+	
+			// Purge extraneous characters from input stream
+			flushInput();
+		}
+		else ch = getch();
 
-		// Purge extraneous characters from input stream
-		flushInput();
+		if (ch == 'm' || ch == 'M') {
+			manual = !manual;
+		}
 
 		char buffer[10];
 		int32_t params[2];
@@ -176,31 +184,45 @@ void *writerThread(void *conn)
 		buffer[0] = NET_COMMAND_PACKET;
 		switch(ch)
 		{
-			case 'f':
-			case 'F':
-			case 'b':
-			case 'B':
-			case 'l':
-			case 'L':
-			case 'r':
-			case 'R':
-						getParams(params);
-						buffer[1] = ch;
-						memcpy(&buffer[2], params, sizeof(params));
-						sendData(conn, buffer, sizeof(buffer));
-						break;
+			case 'w':
+			case 'W':
+			case 'i':
+			case 'I':
 			case 's':
 			case 'S':
-			case 'c':
-			case 'C':
+			case 'k':
+			case 'K':
+			case 'a':
+			case 'A':
+			case 'd':
+			case 'D':
+				if (manual) getParams(params);
+				else {
+					params[0] = 0;
+					params[1] = 0;
+				}
+				buffer[1] = ch;
+				memcpy(&buffer[2], params, sizeof(params));
+				sendData(conn, buffer, sizeof(buffer));
+				break;
+			case 'r':
+			case 'R':
+			case 'v':
+			case 'V':
 			case 'g':
 			case 'G':
-					params[0]=0;
-					params[1]=0;
-					memcpy(&buffer[2], params, sizeof(params));
-					buffer[1] = ch;
-					sendData(conn, buffer, sizeof(buffer));
-					break;
+			case 'c':
+			case 'C':
+			case 'z':
+			case 'Z':
+			case 'm':
+			case 'M':
+				params[0] = 0;
+				params[1] = 0;
+				memcpy(&buffer[2], params, sizeof(params));
+				buffer[1] = ch;
+				sendData(conn, buffer, sizeof(buffer));
+				break;
 			case 'q':
 			case 'Q':
 				quit=1;
