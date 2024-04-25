@@ -1,0 +1,21 @@
+Metadata-Version: 1.1
+Name: Python-ST7789
+Version: 1.0.0
+Summary: Python library to use ST7789-based 240x240 pixel IPS displays with Raspberry Pi.
+Home-page: https://github.com/solinnovay/Python_ST7789/
+Author: Mitsunao Hyodo
+Author-email: hyodo.mitsunao@solinnovay.com
+License: Solinnovay Laboratory
+Description: 
+        # Python_ST7789
+        Python library for using ST7789-based IPS LCD with Raspberry Pi
+        (240x240 pixels, SPI interface, 7 pins without CS pin)
+        
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Software Development
+Classifier: Topic :: System :: Hardware
