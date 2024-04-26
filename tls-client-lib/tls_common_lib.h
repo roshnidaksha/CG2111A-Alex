@@ -12,7 +12,10 @@
 #include <unistd.h>
 #include <errno.h>
 #include <sys/types.h>
+#include "termios.h"
 
+// Function to read characters without waiting for buffer
+char getch();
 
 /** These routines are not generally called from within reader/writer
     threads.  In the event a function that requires an SSL structure
